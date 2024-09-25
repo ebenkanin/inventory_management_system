@@ -3,7 +3,7 @@ This is a Flask based application for an inventory management system. It runs on
 It allows a business manage its inventory in a smooth and efficient manner.
 
 # Features
-*Register user
+* Register user
   - Users can open an account here that allows them to access the inventory data base.
   - They can also log in and log out of sessions.
 * Product list
