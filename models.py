@@ -253,41 +253,6 @@ def update_inventory_trigger():
             conn.close()
 
 
-def register_user():
-        conn = connect_to_db()
-        if not conn:
-            return jsonify({"Error": "Unable to connect to database"}), 404
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        try:
-
-            data = request.get_json()
-
-            required_fields = ['username', 'account_name', 'password', 'role', 'email']
-            missing_fields = [field for field in required_fields if field not in data]
-
-            if missing_fields:
-                return jsonify({"error": f"missing the following required fields: {', '.join(missing_fields)}"}), 400
-
-            username = data['username']
-            account_name = data['account_name']
-            password = generate_password_hash(data['password'])
-            role = data['role']
-            email = data['email']
-
-            if not all([isinstance(username, str), isinstance(account_name, str), isinstance(password, str), isinstance(role, str),
-                        isinstance(email, str)]):
-                return jsonify({"message": "Check input data types and format"})
-
-            create_user(conn, username, account_name, password, role, email)
-            return jsonify({"message": "User registered successfully!"}), 201
-
-        except Exception as e:
-            return jsonify({"message": f"Unable to register user due to {str(e)}"})
-        finally:
-            cursor.close()
-            conn.close()
-
-
 def log_in():
     with app.app_context():
         conn = connect_to_db()
@@ -498,12 +463,12 @@ def delete_item():
 
         # check if item exists in the products list
 
+
 if __name__ == "__main__":
     create_products_table()
     create_user_table()
     create_transactions_table()
     create_inventory_table()
-
     update_inventory_trigger()
 
 

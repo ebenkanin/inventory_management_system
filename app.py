@@ -39,14 +39,32 @@ def register_user():
                     isinstance(email, str)]):
             return jsonify({"message": "Check input data types and format"})
 
+            # Check if the user already exists
+        cursor.execute("""
+           SELECT user_name, account_name FROM users 
+           WHERE user_name = %s AND account_name = %s
+           """, (username, account_name))
+
+        user = cursor.fetchone()
+
+        if user:
+            return jsonify({"message": "This user already exists. Log in to your account"}), 409
+
+        # Insert the new user into the database
+        cursor.execute("""
+           INSERT INTO users(user_name, account_name, password, role, email) 
+           VALUES(%s, %s, %s, %s, %s)
+           """, (username, account_name, password, role, email))
+
+        conn.commit()
+
     except Exception as e:
-        return jsonify({"message": f"Unable to register user due to {str(e)}"})
+        return jsonify({"message": f"Unable to register user due to: {str(e)}"}), 500
     finally:
         cursor.close()
         conn.close()
 
-
-# calling and returning the create user function to register user
+    return jsonify({"message": f"{username} successfully registered"}), 201
 
 
 # logging in user
@@ -82,6 +100,12 @@ def log_in():
             return jsonify({"message": "Log in unsuccessful. Check username or password"}), 400
     except Exception as e:
         return jsonify({"message": f"an error occurred str{str(e)}"})  # calling the log in function to enable user log in.
+
+
+@app.route("/logout", methods=['POST'])
+def log_out():
+    session.clear()
+    return jsonify({"message":"Logged out successfully"}), 200
 
 
 @app.route("/create-product", methods=['POST'])
